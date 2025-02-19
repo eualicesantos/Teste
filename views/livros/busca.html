@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Buscar Livro</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Buscar Livro</h2>
+
+        <form id="formBusca">
+            <div class="mb-3">
+                <label for="termo" class="form-label">Digite o ID, título ou autor do livro:</label>
+                <input type="text" class="form-control" id="termo" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='livros.html'">Voltar</button>
+        </form>
+
+        <div class="mt-4" id="resultado"></div>
+    </div>
+
+    <script>
+        document.getElementById('formBusca').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const termo = document.getElementById('termo').value.trim();
+            if (!termo) {
+                document.getElementById('resultado').innerHTML = '<p class="text-danger">Por favor, insira um termo de busca.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:2200/Livros/buscar?termo=${encodeURIComponent(termo)}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.erro || 'Erro ao buscar livro');
+                }
+
+                let resultadoHTML = `
+                    <h3>Livro Encontrado:</h3>
+                    <ul class="list-group">
+                        ${data.map(livro => `
+                            <li class="list-group-item"><strong>ID:</strong> ${livro.id}</li>
+                            <li class="list-group-item"><strong>Título:</strong> ${livro.titulo}</li>
+                            <li class="list-group-item"><strong>Autor:</strong> ${livro.autor}</li>
+                            <li class="list-group-item"><strong>Ano:</strong> ${livro.ano}</li>
+                        `).join('')}
+                    </ul>
+                `;
+                
+                document.getElementById('resultado').innerHTML = resultadoHTML;
+            } catch (error) {
+                document.getElementById('resultado').innerHTML = `<p class="text-danger">${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

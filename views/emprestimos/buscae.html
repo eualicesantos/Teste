@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Buscar Empréstimo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Buscar Empréstimo</h2>
+
+        <form id="formBuscaEmprestimo">
+            <div class="mb-3">
+                <label for="termo" class="form-label">Digite o ID do usuário ou do livro:</label>
+                <input type="text" class="form-control" id="termo" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">Voltar</button>
+        </form>
+
+        <div class="mt-4" id="resultado"></div>
+    </div>
+
+    <script>
+        document.getElementById('formBuscaEmprestimo').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const termo = document.getElementById('termo').value.trim();
+            if (!termo) {
+                document.getElementById('resultado').innerHTML = '<p class="text-danger">Por favor, insira um termo de busca.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:2200/emprestimos/buscar?termo=${encodeURIComponent(termo)}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.erro || 'Erro ao buscar empréstimo');
+                }
+
+                let resultadoHTML = `<h3>Empréstimos Encontrados:</h3><ul class="list-group">`;
+                data.forEach(emprestimo => {
+                    resultadoHTML += `
+                        <li class="list-group-item">
+                            <strong>ID do Empréstimo:</strong> ${emprestimo.id}<br>
+                            <strong>ID do Usuário:</strong> ${emprestimo.id_usuario}<br>
+                            <strong>ID do Livro:</strong> ${emprestimo.id_livro}<br>
+                            <strong>Data de Empréstimo:</strong> ${new Date(emprestimo.data_emprestimo).toLocaleDateString()}<br>
+                            <strong>Data de Devolução:</strong> ${emprestimo.data_devolucao ? new Date(emprestimo.data_devolucao).toLocaleDateString() : 'Ainda não devolvido'}<br>
+                            <strong>Status:</strong> ${emprestimo.status}
+                        </li>`;
+                });
+                resultadoHTML += `</ul>`;
+                
+                document.getElementById('resultado').innerHTML = resultadoHTML;
+            } catch (error) {
+                document.getElementById('resultado').innerHTML = `<p class="text-danger">${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

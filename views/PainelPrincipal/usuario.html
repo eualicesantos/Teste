@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Administrador</title>
+    <link rel="stylesheet" href="/public/css/usuario.css">
+    <script defer src="/models/Usuario.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Biblioteca</h2>
+        <ul>
+            <li class="active"> Início</li>
+            <li><a href="/views/MeusLivros/meuslivros.html"> Meus Livros</a></li>
+            <li> Configurações</li>
+            <li><a href="#" id="logout-admin">Sair</a></li>
+        </ul>
+    </div>    
+    <div class="main-content">
+        <header>
+            <h1>Bem-vindo, <span id="username">Usuário</span>!</h1>
+        </header>
+        <script>
+            fetch("/user")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.username) {
+                        document.getElementById("username").innerText = data.username;
+                    }
+                })
+                .catch(error => console.error("Erro ao carregar usuário:", error));
+        </script>
+        
+        <div class="cards-container">
+            <div class="card"><a href="/views/Gerenciamento/gerusuario.html"> Gerenciar Usuários</a></div>
+            <div class="card"> Gerenciar Livros</div>
+            <div class="card"> Gerenciar Empréstimos </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById("logout-admin").addEventListener("click", function () {
+            fetch("/logout", { method: "POST" })
+                .then(() => window.location.href = "/views/TelaInicial/telainicial.html")
+                .catch(error => console.error("Erro ao sair:", error));
+        });
+    </script>
+</body>
+</html>

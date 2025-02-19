@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="/img/Livro.jpeg" alt="Login">
+        </div>
+        <div class="login-container">
+            <h1>Login</h1>
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Usuário" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Senha" required>
+            </div>
+            <button class="login" onclick="loginUser()">Entrar</button>
+            <p class="forgot-password"><a href="#">Esqueceu sua senha?</a></p>
+            <p class="register-link">Não tem uma conta? <a href="../TelaRegistro/registro.html">Registre-se</a></p>
+        </div>
+    </div>
+
+    <div id="adminOptions" style="display: none;" class="admin-container">
+        <h2>Opções de Administrador</h2>
+        <button onclick="addUser()">Adicionar Usuário</button>
+        <button onclick="updateUser()">Atualizar Usuário</button>
+        <button onclick="deleteUser()">Excluir Usuário</button>
+    </div>
+
+    <script src="/models/Login.js"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gerenciamento de Empréstimos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Gerenciamento de Empréstimos</h2>
+        
+        <form id="formEmprestimo" class="mb-4">
+            <div class="row">
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success w-100" onclick="window.location.href='../../index.html'">Voltar</button>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success w-100" onclick="window.location.href='/cadastradoe.html'">Adicionar</button>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-success w-100" onclick="window.location.href='buscae.html'">Buscar</button>
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuário</th>
+                    <th>Livro</th>
+                    <th>Data Empréstimo</th>
+                    <th>Data Devolução</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listaEmprestimos">
+                <!-- Inserindo via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            async function listarEmprestimos() {
+                try {
+                    const response = await fetch('http://localhost:2200/Emprestimos/listar');
+    
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta da API: ' + response.status + ' - ' + response.statusText);
+                    }
+    
+                    const emprestimos = await response.json();
+    
+                    if (emprestimos.length === 0) {
+                        document.getElementById('listaEmprestimos').innerHTML = '<tr><td colspan="7">Nenhum empréstimo encontrado</td></tr>';
+                    } else {
+                        let emprestimosHTML = '';
+                        emprestimos.forEach(emprestimo => {
+                            emprestimosHTML += `
+                                <tr id="emprestimo-${emprestimo.id}">
+                                    <td>${emprestimo.id}</td>
+                                    <td>${emprestimo.usuario}</td>
+                                    <td>${emprestimo.livro}</td>
+                                    <td>${emprestimo.dataEmprestimo}</td>
+                                    <td>${emprestimo.dataDevolucao}</td>
+                                    <td id="status-${emprestimo.id}">${emprestimo.status}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm" onclick="devolverLivro(${emprestimo.id})">Devolver</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        document.getElementById('listaEmprestimos').innerHTML = emprestimosHTML;
+                    }
+                } catch (error) {
+                    console.error('Erro ao listar empréstimos:', error);
+                    document.getElementById('listaEmprestimos').innerHTML = `<tr><td colspan="7">Erro ao carregar empréstimos: ${error.message}</td></tr>`;
+                }
+            }
+    
+            async function devolverLivro(id) {
+                if (confirm('Tem certeza que deseja marcar este empréstimo como devolvido?')) {
+                    try {
+                        const response = await fetch(`http://localhost:2200/Emprestimos/${id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status: 'Devolvido' })
+                        });
+    
+                        if (!response.ok) {
+                            throw new Error('Erro ao atualizar o status do empréstimo');
+                        }
+    
+                        alert('Empréstimo marcado como devolvido!');
+                        document.getElementById(`status-${id}`).innerText = 'Devolvido';
+                    } catch (error) {
+                        alert('Erro ao atualizar o status: ' + error.message);
+                    }
+                }
+            }
+    
+            listarEmprestimos();
+        });
+    </script>
+</body>
+</html>

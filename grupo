@@ -1,0 +1,16 @@
+Grupo 6 - Sistema de Gestão de Biblioteca
+Descrição: Plataforma para controle de empréstimos e catálogo de livros.
+
+1. Programador 1 (Alice Maria)
+• Cadastro de Usuários
+• Sistema de Controle de Usuários
+• Funcionalidades de Login
+• Tela principal com todas as funcionalidades envolvidas.
+
+2. Programador 2 (Gabriel Luis)
+• Gerenciamento de Livros (cadastro, consulta, edição)
+• Gerenciamento de Empréstimos (Cadastro, editar e exclusão)
+
+3. Programador 3  (Ana Flávia)
+• Gerenciamento dos Reservas (cadastro, edição e exclusão)
+• Gerenciamento de Avaliações (cadastro, edição e exclusão)

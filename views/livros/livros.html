@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gerenciamento de Livros</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Gerenciamento de Livros</h2>
+        
+        <form id="formLivro" class="mb-4">
+            <div class="row">
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success w-100" onclick="window.location.href='../../index.html'">Voltar</button>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success w-100" onclick="window.location.href='Cadastro.html'">Adicionar</button>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-success w-100" onclick="window.location.href='busca.html'">Buscar</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Tabela de Livros -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Ano</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listaLivros">
+                <!-- Inserindo via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Script para fazer a requisição dos livros -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            async function listarLivros() {
+                try {
+                    const response = await fetch('http://localhost:2200/Livros/listar');
+    
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta da API: ' + response.status + ' - ' + response.statusText);
+                    }
+    
+                    const livros = await response.json();
+    
+                    if (livros.length === 0) {
+                        document.getElementById('listaLivros').innerHTML = '<tr><td colspan="5">Nenhum livro encontrado</td></tr>';
+                    } else {
+                        let livrosHTML = '';
+                        livros.forEach(livro => {
+                            livrosHTML += `
+                                <tr id="livro-${livro.id}">
+                                    <td>${livro.id}</td>
+                                    <td><span id="titulo-${livro.id}">${livro.titulo}</span></td>
+                                    <td><span id="autor-${livro.id}">${livro.autor}</span></td>
+                                    <td><span id="ano-${livro.id}">${livro.ano}</span></td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm" onclick="editarLivro(${livro.id})">Editar</button>
+                                        <button class="btn btn-danger btn-sm" onclick="excluirLivro(${livro.id})">Excluir</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        document.getElementById('listaLivros').innerHTML = livrosHTML;
+                    }
+                } catch (error) {
+                    console.error('Erro ao listar livros:', error);
+                    document.getElementById('listaLivros').innerHTML = `<tr><td colspan="5">Erro ao carregar livros: ${error.message}</td></tr>`;
+                }
+            }
+    
+            // Função para excluir livro
+            async function excluirLivro(id) {
+                if (confirm('Tem certeza que deseja excluir este livro?')) {
+                    try {
+                        const response = await fetch(`http://localhost:2200/Livros/${id}`, {
+                            method: 'DELETE'
+                        });
+    
+                        if (!response.ok) {
+                            throw new Error('Erro ao excluir o livro');
+                        }
+    
+                        alert('Livro excluído com sucesso!');
+                        document.getElementById(`livro-${id}`).remove();
+                    } catch (error) {
+                        alert('Erro ao excluir o livro: ' + error.message);
+                    }
+                }
+            }
+    
+            // Função para editar um livro
+            function editarLivro(id) {
+                const titulo = document.getElementById(`titulo-${id}`).innerText;
+                const autor = document.getElementById(`autor-${id}`).innerText;
+                const ano = document.getElementById(`ano-${id}`).innerText;
+    
+                document.getElementById(`livro-${id}`).innerHTML = `
+                    <td>${id}</td>
+                    <td><input type="text" id="novo-titulo-${id}" value="${titulo}" class="form-control"></td>
+                    <td><input type="text" id="novo-autor-${id}" value="${autor}" class="form-control"></td>
+                    <td><input type="number" id="novo-ano-${id}" value="${ano}" class="form-control"></td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="salvarEdicao(${id})">Salvar</button>
+                        <button class="btn btn-secondary btn-sm" onclick="listarLivros()">Cancelar</button>
+                    </td>
+                `;
+            }
+    
+            // Função para salvar a edição do livro
+            async function salvarEdicao(id) {
+                const novoTitulo = document.getElementById(`novo-titulo-${id}`).value;
+                const novoAutor = document.getElementById(`novo-autor-${id}`).value;
+                const novoAno = document.getElementById(`novo-ano-${id}`).value;
+    
+                try {
+                    const response = await fetch(`http://localhost:2200/Livros/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ titulo: novoTitulo, autor: novoAutor, ano: novoAno })
+                    });
+    
+                    if (!response.ok) {
+                        throw new Error('Erro ao atualizar o livro');
+                    }
+    
+                    alert('Livro atualizado com sucesso!');
+                    listarLivros();
+                } catch (error) {
+                    alert('Erro ao atualizar o livro: ' + error.message);
+                }
+            }
+    
+            // Chama a função ao carregar a página
+            listarLivros();
+        });
+    </script>
+</body>
+</html>

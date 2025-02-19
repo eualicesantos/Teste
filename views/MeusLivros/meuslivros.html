@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Livros</title>
+    <link rel="stylesheet" href="/public/css/usuario.css">
+    <script defer src="/models/MeusLivros.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Biblioteca</h2>
+        <ul>
+            <li><a href="/views/PainelPrincipal/usuario.html"> Início</a></li>
+            <li class="active"> Meus Livros</li>
+            <li> Favoritos</li>
+            <li> Configurações</li>
+            <li><a href="#" id="logout">Sair</a></li>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <header>
+            <h1>Meus Livros</h1>
+        </header>
+        <div class="shelf" id="booksContainer">
+            <!-- Os livros cadastrados serão adicionados dinamicamente aqui -->
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById("logout").addEventListener("click", function () {
+            fetch("/logout", { method: "POST" })
+                .then(() => window.location.href = "/views/TelaInicial/telainicial.html")
+                .catch(error => console.error("Erro ao sair:", error));
+        });
+    </script>
+</body>
+</html>
